@@ -9,14 +9,25 @@ function addMessage(message) {
 }
 
 async function getMessage(filterUser) {
-    //asi leemos datos y buscamos si es necesario
-    let filter = {};
-    if (filterUser != null) {
-        // regExp con la i, nos ayuda a omitir mayusculas y minusculas
-        filter = { user: new RegExp(filterUser, "i") };
-    }
-    const messages = await Model.find(filter);
-    return messages;
+   
+    return new Promise((resolve, reject) => {
+        //asi leemos datos y buscamos si es necesario
+        let filter = {};
+        if (filterUser != null) {
+            // regExp con la i, nos ayuda a omitir mayusculas y minusculas
+            filter = { user: new RegExp(filterUser, "i") };
+        }
+        // con populate, buscaremos el ObjectId
+        const messages = Model.find(filter)
+        .populate('user')
+        .exec((error, populated) => {
+            if (error) {
+                reject(error);
+                return false;
+            }
+            resolve(populated);
+        })
+    })
 }
 
 async function updateText(id, message){
